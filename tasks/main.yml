@@ -3,22 +3,22 @@
 - name: update apt package cache
   become: true
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 86400
 
 - name: "add jump user {{ jump_host.user_name }}"
-  user:
+  ansible.builtin.user:
     name: "{{ jump_host.user_name }}"
     comment: "{{ jump_host.user_comment }}"
     group: "{{ jump_host.user_group }}"
     groups: "{{ jump_host.user_groups | join(',') }}"
-    createhome: yes
+    createhome: true
 
 - name: ensure ansible repo
   ansible.builtin.git:
     repo: "{{ jump_host.ansible_repo }}"
     dest: "/home/{{ jump_host.user_name }}/ansible"
-    accept_hostkey: yes
+    accept_hostkey: true
   become_user: "{{ jump_host.user_name }}"
 
 - name: ensure jumphost specifig packages
