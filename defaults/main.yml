@@ -20,4 +20,3 @@ jump_host:
     - i2c
     - gpio
   ansible_repo: git@yourgitlab.tld:user/repo.git
-

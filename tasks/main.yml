@@ -19,6 +19,7 @@
     repo: "{{ jump_host.ansible_repo }}"
     dest: "/home/{{ jump_host.user_name }}/ansible"
     accept_hostkey: true
+    version: HEAD
   become_user: "{{ jump_host.user_name }}"
 
 - name: ensure jumphost specifig packages
