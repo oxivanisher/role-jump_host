@@ -1,2 +1,23 @@
 ---
-# defaults file for jump_host
+
+jump_host:
+  ssh_port: 99922
+  user_name: example
+  user_comment: John Doe
+  user_group: example
+  user_groups:
+    - adm
+    - dialout
+    - cdrom
+    - sudo
+    - audio
+    - video
+    - plugdev
+    - games
+    - input
+    - netdev
+    - spi
+    - i2c
+    - gpio
+  ansible_repo: git@yourgitlab.tld:user/repo.git
+
