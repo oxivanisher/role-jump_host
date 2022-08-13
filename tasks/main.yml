@@ -14,12 +14,11 @@
     groups: "{{ jump_host.user_groups | join(',') }}"
     createhome: true
 
-- name: ensure ansible repo
+- name: ensure ansible repo  # noqa git-latest
   ansible.builtin.git:
     repo: "{{ jump_host.ansible_repo }}"
     dest: "/home/{{ jump_host.user_name }}/ansible"
     accept_hostkey: true
-    version: HEAD
   become_user: "{{ jump_host.user_name }}"
 
 - name: ensure jumphost specifig packages
