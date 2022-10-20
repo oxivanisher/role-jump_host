@@ -1,12 +1,12 @@
 ---
 
-- name: update apt package cache
+- name: Update apt package cache
   become: true
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 86400
 
-- name: "add jump user {{ jump_host.user_name }}"
+- name: "Add jump user {{ jump_host.user_name }}"
   ansible.builtin.user:
     name: "{{ jump_host.user_name }}"
     comment: "{{ jump_host.user_comment }}"
@@ -14,14 +14,14 @@
     groups: "{{ jump_host.user_groups | join(',') }}"
     createhome: true
 
-- name: ensure ansible repo  # noqa git-latest
+- name: Ensure ansible repo  # noqa git-latest
   ansible.builtin.git:
     repo: "{{ jump_host.ansible_repo }}"
     dest: "/home/{{ jump_host.user_name }}/ansible"
     accept_hostkey: true
   become_user: "{{ jump_host.user_name }}"
 
-- name: ensure jumphost specifig packages
+- name: Ensure jumphost specifig packages
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
@@ -35,25 +35,25 @@
     - nmap
     - xclip
 
-- name: install powerline-status
+- name: Install powerline-status
   ansible.builtin.pip:
     name: ['powerline-status', 'powerline-gitstatus']
     executable: pip3
 
-- name: "configure port 22 for sshd"
+- name: "Configure port 22 for sshd"
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "Port 22"
     line: "Port 22"
-  notify: restart sshd
+  notify: Restart sshd
 
-- name: "configure additional port {{ jump_host.ssh_port }} for sshd"
+- name: "Configure additional port {{ jump_host.ssh_port }} for sshd"
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "^Port {{ jump_host.ssh_port }}"
     line: "Port {{ jump_host.ssh_port }}"
     insertafter: "^Port 22"
-  notify: restart sshd
+  notify: Restart sshd
 
 # TODO
 # * remember install longview
