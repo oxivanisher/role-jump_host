@@ -47,7 +47,7 @@
     line: "Port 22"
   notify: Restart sshd
 
-- name: "Configure additional port {{ jump_host.ssh_port }} for sshd"
+- name: "Configure additional sshd port {{ jump_host.ssh_port }}"
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "^Port {{ jump_host.ssh_port }}"
