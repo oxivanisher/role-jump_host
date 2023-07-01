@@ -27,6 +27,7 @@
   loop:
     - tmux
     - python3-full
+    - python3-virtualenv
     - dnsutils
     - pwgen
     - nmap
