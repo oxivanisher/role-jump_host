@@ -26,8 +26,7 @@
     state: present
   loop:
     - tmux
-    - python3
-    - python3-pip
+    - python3-full
     - fonts-powerline
     - dnsutils
     - pwgen
@@ -58,6 +57,4 @@
     insertafter: "^Port 22"
   notify: Restart sshd
 # TODO
-# * remember install longview
-# * evtl. skeeve mount? lieber plex
 # * As user oxi after sync: python .nextrsync/Settings/Linux/setup.py
