@@ -1,5 +1,4 @@
 ---
-
 - name: Update apt package cache
   become: true
   ansible.builtin.apt:
@@ -14,7 +13,7 @@
     groups: "{{ jump_host.user_groups | join(',') }}"
     createhome: true
 
-- name: Ensure ansible repo  # noqa git-latest
+- name: Ensure ansible repo # noqa git-latest
   ansible.builtin.git:
     repo: "{{ jump_host.ansible_repo }}"
     dest: "/home/{{ jump_host.user_name }}/ansible"
@@ -37,8 +36,12 @@
 
 - name: Install powerline-status
   ansible.builtin.pip:
-    name: ['powerline-status', 'powerline-gitstatus']
-    executable: pip3
+    name:
+      - powerline-status
+      - powerline-gitstatus
+    virtualenv: "/home/{{ jump_host.user_name }}/.local"
+  become: true
+  become_user: "{{ jump_host.user_name }}"
 
 - name: "Configure port 22 for sshd"
   ansible.builtin.lineinfile:
@@ -54,7 +57,6 @@
     line: "Port {{ jump_host.ssh_port }}"
     insertafter: "^Port 22"
   notify: Restart sshd
-
 # TODO
 # * remember install longview
 # * evtl. skeeve mount? lieber plex
