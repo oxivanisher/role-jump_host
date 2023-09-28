@@ -19,6 +19,7 @@
     dest: "/home/{{ jump_host.user_name }}/ansible"
     accept_hostkey: true
   become_user: "{{ jump_host.user_name }}"
+  become: true
 
 - name: Ensure jumphost specifig packages
   ansible.builtin.package:
