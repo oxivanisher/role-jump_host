@@ -19,6 +19,7 @@
     dest: "/home/{{ jump_host.user_name }}/ansible"
     key_file: "/home/{{ jump_host.user_name }}/.ssh/id_rsa"
     accept_hostkey: true
+    ssh_opts: ControlMaster=no
   become_user: "{{ jump_host.user_name }}"
   become: true
 
