@@ -17,6 +17,7 @@
   ansible.builtin.git:
     repo: "{{ jump_host.ansible_repo }}"
     dest: "/home/{{ jump_host.user_name }}/ansible"
+    key_file: "/home/{{ jump_host.user_name }}/.ssh/id_rsa"
     accept_hostkey: true
   become_user: "{{ jump_host.user_name }}"
   become: true
