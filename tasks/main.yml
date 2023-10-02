@@ -21,7 +21,7 @@
     accept_hostkey: true
     # ssh_opts: "ControlMaster=no"
   become_user: "{{ jump_host.user_name }}"
-  become: true
+  # become: true
 
 - name: Ensure jumphost specifig packages
   ansible.builtin.package:
