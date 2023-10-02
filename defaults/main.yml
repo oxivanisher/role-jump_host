@@ -19,3 +19,7 @@ jump_host:
     - i2c
     - gpio
   ansible_repo: git@yourgitlab.tld:user/repo.git
+  git_clone_private_key: >
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      Some SSH private key
+      -----END OPENSSH PRIVATE KEY-----

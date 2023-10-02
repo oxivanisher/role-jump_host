@@ -6,6 +6,7 @@
     cache_valid_time: 86400
 
 - name: "Add jump user {{ jump_host.user_name }}"
+  become: true
   ansible.builtin.user:
     name: "{{ jump_host.user_name }}"
     comment: "{{ jump_host.user_comment }}"
@@ -13,17 +14,28 @@
     groups: "{{ jump_host.user_groups | join(',') }}"
     createhome: true
 
+- name: Deploy SSH key to clone ansible repo
+  become_user: "{{ jump_host.user_name }}"
+  become: true
+  ansible.builtin.copy:
+    content: "{{ jump_host.git_clone_private_key }}"
+    dest: "/home/{{ jump_host.user_name }}/.ssh/ansible_jump_host_git_clone_private_key"
+    owner: "{{ jump_host.user_name }}"
+    group: "{{ jump_host.user_group }}"
+    mode: "0600"
+
 - name: Ensure ansible repo # noqa git-latest
+  become_user: "{{ jump_host.user_name }}"
+  become: true
   ansible.builtin.git:
     repo: "{{ jump_host.ansible_repo }}"
     dest: "/home/{{ jump_host.user_name }}/ansible"
-    key_file: "/home/{{ jump_host.user_name }}/.ssh/id_rsa"
+    key_file: "/home/{{ jump_host.user_name }}/.ssh/ansible_jump_host_git_clone_private_key"
     accept_hostkey: true
-    # ssh_opts: "ControlMaster=no"
-  become_user: "{{ jump_host.user_name }}"
-  # become: true
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure jumphost specifig packages
+  become: true
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
@@ -49,6 +61,7 @@
 #   become_user: "{{ jump_host.user_name }}"
 
 - name: "Configure port 22 for sshd"
+  become: true
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "Port 22"
@@ -56,6 +69,7 @@
   notify: Restart sshd
 
 - name: "Configure additional sshd port {{ jump_host.ssh_port }}"
+  become: true
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "^Port {{ jump_host.ssh_port }}"
