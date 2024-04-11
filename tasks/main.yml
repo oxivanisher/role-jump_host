@@ -1,53 +1,75 @@
 ---
-- name: Update apt package cache
+- name: "Add jump users group exists {{ jump_host_user_name }}"
+  ansible.builtin.group:
+    name: "{{ jump_host_user_name }}"
+    state: present
   become: true
-  ansible.builtin.apt:
-    update_cache: true
-    cache_valid_time: 86400
+  become_user: root
 
-- name: "Add jump user {{ jump_host.user_name }}"
-  become: true
+- name: "Add jump user {{ jump_host_user_name }}"
   ansible.builtin.user:
-    name: "{{ jump_host.user_name }}"
-    comment: "{{ jump_host.user_comment }}"
-    group: "{{ jump_host.user_group }}"
-    groups: "{{ jump_host.user_groups | join(',') }}"
+    name: "{{ jump_host_user_name }}"
+    comment: "{{ jump_host_user_comment }}"
+    group: "{{ jump_host_user_name }}"
+    groups: "{{ jump_host_user_groups }}"
     createhome: true
+  become: true
+  become_user: root
+
+- name: Ensure .ssh exists and is secure
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.ssh"
+    state: directory
+    owner: "{{ jump_host_user_name }}"
+    group: "{{ jump_host_user_name }}"
+    mode: '0700'
+  become: true
+  become_user: "{{ jump_host_user_name }}"
+
+- name: Ensure .ssh/controlmasters exists and is secure
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.ssh/controlmasters"
+    state: directory
+    owner: "{{ jump_host_user_name }}"
+    group: "{{ jump_host_user_name }}"
+    mode: '0700'
+  become: true
+  become_user: "{{ jump_host_user_name }}"
 
 - name: Deploy SSH key to clone ansible repo
-  become_user: "{{ jump_host.user_name }}"
-  become: true
   ansible.builtin.copy:
-    content: "{{ jump_host.git_clone_private_key }}"
-    dest: "/home/{{ jump_host.user_name }}/.ssh/ansible_jump_host_git_clone_private_key"
-    owner: "{{ jump_host.user_name }}"
-    group: "{{ jump_host.user_group }}"
+    content: "{{ jump_host_git_clone_private_key }}"
+    dest: "{{ lookup('env', 'HOME') }}/.ssh/ansible_jump_host_git_clone_private_key"
+    owner: "{{ jump_host_user_name }}"
+    group: "{{ jump_host_user_name }}"
     mode: "0600"
-
-- name: Ensure ansible repo # noqa git-latest
-  become_user: "{{ jump_host.user_name }}"
   become: true
+  become_user: "{{ jump_host_user_name }}"
+
+- name: Ensure ansible repo # noqa latest[git]
   ansible.builtin.git:
-    repo: "{{ jump_host.ansible_repo }}"
-    dest: "/home/{{ jump_host.user_name }}/ansible"
-    key_file: "/home/{{ jump_host.user_name }}/.ssh/ansible_jump_host_git_clone_private_key"
+    repo: "{{ jump_host_ansible_repo }}"
+    dest: "{{ lookup('env', 'HOME') }}/ansible"
+    key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_jump_host_git_clone_private_key"
     accept_hostkey: true
   ignore_errors: "{{ ansible_check_mode }}"
+  become: true
+  become_user: "{{ jump_host_user_name }}"
 
 - name: Ensure jumphost specifig packages
-  become: true
   ansible.builtin.package:
-    name: "{{ item }}"
+    name:
+      - tmux
+      - python3-full
+      - python3-virtualenv
+      - dnsutils
+      - pwgen
+      - nmap
+      - xclip
+      # - fonts-powerline
     state: present
-  loop:
-    - tmux
-    - python3-full
-    - python3-virtualenv
-    - dnsutils
-    - pwgen
-    - nmap
-    - xclip
-    # - fonts-powerline
+  become: true
+  become_user: root
 
 # Powerline seems to be broken since it requires e "python" executable and not python3?
 # Is this project even alive?
@@ -56,25 +78,28 @@
 #     name:
 #       - powerline-status
 #       - powerline-gitstatus
-#     virtualenv: "/home/{{ jump_host.user_name }}/.local"
+#     virtualenv: "/home/{{ jump_host_user_name }}/.local"
 #   become: true
-#   become_user: "{{ jump_host.user_name }}"
+#   become_user: "{{ jump_host_user_name }}"
 
 - name: "Configure port 22 for sshd"
-  become: true
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "Port 22"
     line: "Port 22"
   notify: Restart sshd
-
-- name: "Configure additional sshd port {{ jump_host.ssh_port }}"
   become: true
+  become_user: root
+
+- name: "Configure additional sshd port {{ jump_host_ssh_port }}"
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: "^Port {{ jump_host.ssh_port }}"
-    line: "Port {{ jump_host.ssh_port }}"
+    regexp: "^Port {{ jump_host_ssh_port }}"
+    line: "Port {{ jump_host_ssh_port }}"
     insertafter: "^Port 22"
   notify: Restart sshd
+  become: true
+  become_user: root
+
 # TODO
 # * As user oxi after sync: python .nextrsync/Settings/Linux/setup.py

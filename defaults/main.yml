@@ -1,10 +1,8 @@
 ---
-jump_host:
-  ssh_port: 99922
-  user_name: example
-  user_comment: John Doe
-  user_group: example
-  user_groups:
+jump_host_ssh_port: 99922
+jump_host_user_name: example
+jump_host_user_comment: John Doe
+jump_host_user_groups:
     - adm
     - dialout
     - cdrom
@@ -18,8 +16,10 @@ jump_host:
     - spi
     - i2c
     - gpio
-  ansible_repo: git@yourgitlab.tld:user/repo.git
-  git_clone_private_key: >
-      -----BEGIN OPENSSH PRIVATE KEY-----
-      Some SSH private key
-      -----END OPENSSH PRIVATE KEY-----
+    - users
+jump_host_ansible_repo: git@yourgitlab.tld:user/repo.git
+jump_host_ansible_location: ansible
+jump_host_git_clone_private_key: >
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  Some SSH private key
+  -----END OPENSSH PRIVATE KEY-----
