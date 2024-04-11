@@ -16,41 +16,50 @@
   become: true
   become_user: root
 
+- name: Get home directory of jump host user
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ jump_host_user_name }}"
+
+- name: Set home directory var for jump host user
+  ansible.builtin.set_fact:
+    jump_host_user_home: "{{ getent_passwd[jump_host_user_name][4] }}"
+
 - name: Ensure .ssh exists and is secure
   ansible.builtin.file:
-    path: "{{ lookup('env', 'HOME') }}/.ssh"
+    path: "{{ jump_host_user_home }}/.ssh"
     state: directory
     owner: "{{ jump_host_user_name }}"
     group: "{{ jump_host_user_name }}"
     mode: '0700'
   become: true
-  become_user: "{{ jump_host_user_name }}"
+  become_user: root
 
 - name: Ensure .ssh/controlmasters exists and is secure
   ansible.builtin.file:
-    path: "{{ lookup('env', 'HOME') }}/.ssh/controlmasters"
+    path: "{{ jump_host_user_home }}/.ssh/controlmasters"
     state: directory
     owner: "{{ jump_host_user_name }}"
     group: "{{ jump_host_user_name }}"
     mode: '0700'
   become: true
-  become_user: "{{ jump_host_user_name }}"
+  become_user: root
 
 - name: Deploy SSH key to clone ansible repo
   ansible.builtin.copy:
     content: "{{ jump_host_git_clone_private_key }}"
-    dest: "{{ lookup('env', 'HOME') }}/.ssh/ansible_jump_host_git_clone_private_key"
+    dest: "{{ jump_host_user_home }}/.ssh/ansible_jump_host_git_clone_private_key"
     owner: "{{ jump_host_user_name }}"
     group: "{{ jump_host_user_name }}"
     mode: "0600"
   become: true
-  become_user: "{{ jump_host_user_name }}"
+  become_user: root
 
 - name: Ensure ansible repo # noqa latest[git]
   ansible.builtin.git:
     repo: "{{ jump_host_ansible_repo }}"
-    dest: "{{ lookup('env', 'HOME') }}/ansible"
-    key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_jump_host_git_clone_private_key"
+    dest: "{{ jump_host_user_home }}/ansible"
+    key_file: "{{ jump_host_user_home }}/.ssh/ansible_jump_host_git_clone_private_key"
     accept_hostkey: true
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
