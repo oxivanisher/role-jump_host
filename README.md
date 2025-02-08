@@ -1,5 +1,6 @@
 jump_host
 =========
+[![Ansible Lint](https://github.com/oxivanisher/role-jump_host/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/oxivanisher/role-jump_host/actions/workflows/ansible-lint.yml)
 
 This role configures jump host things like:
 * Ensuring a user specific user is present and configured
