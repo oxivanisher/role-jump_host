@@ -13,6 +13,7 @@
     group: "{{ jump_host_user_name }}"
     groups: "{{ jump_host_user_groups }}"
     createhome: true
+    append: true
   become: true
   become_user: root
 
