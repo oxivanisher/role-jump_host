@@ -88,17 +88,6 @@
   become: true
   become_user: root
 
-# Powerline seems to be broken since it requires e "python" executable and not python3?
-# Is this project even alive?
-# - name: Install powerline-status
-#   ansible.builtin.pip:
-#     name:
-#       - powerline-status
-#       - powerline-gitstatus
-#     virtualenv: "/home/{{ jump_host_user_name }}/.local"
-#   become: true
-#   become_user: "{{ jump_host_user_name }}"
-
 - name: "Configure port 22 for sshd"
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
