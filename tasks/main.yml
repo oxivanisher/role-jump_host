@@ -23,16 +23,15 @@
     key: "{{ jump_host_user_name }}"
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Set home directory var for jump host user
-  ansible.builtin.set_fact:
-    jump_host_user_home: "{{ getent_passwd[jump_host_user_name][4] }}"
-  ignore_errors: "{{ ansible_check_mode }}"
+- name: Gather jump_host_user_name user infos
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ jump_host_user_name }}"
 
-- name: Lookup user group
+- name: Lookup home and group for jump_host_user_name
   ansible.builtin.set_fact:
-    jump_host_user_group: "{{ lookup('pipe', 'id -gn') }}"
-  become: true
-  become_user: "{{ jump_host_user_name }}"
+    jump_host_user_group: "{{ getent_passwd[jump_host_user_name][2] }}"
+    jump_host_user_home: "{{ getent_passwd[jump_host_user_name][4] }}"
 
 - name: Ensure .ssh exists and is secure
   ansible.builtin.file:
