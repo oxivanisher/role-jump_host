@@ -30,8 +30,8 @@
 
 - name: Lookup home and group for jump_host_user_name
   ansible.builtin.set_fact:
-    jump_host_user_group: "{{ getent_passwd[jump_host_user_name][2] }}"
-    jump_host_user_home: "{{ getent_passwd[jump_host_user_name][4] }}"
+    jump_host_user_group: "{{ ansible_facts.getent_passwd[jump_host_user_name][2] }}"
+    jump_host_user_home: "{{ ansible_facts.getent_passwd[jump_host_user_name][4] }}"
 
 - name: Ensure .ssh exists and is secure
   ansible.builtin.file:
